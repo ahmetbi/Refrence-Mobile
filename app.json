@@ -41,10 +41,10 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "47388585-5cdf-4653-b76f-06aa001c7f6d"
-      }
+      "router": {}
+    },
+    "cli": {
+      "appVersionSource": "remote"
     }
   }
 }
