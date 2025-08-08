@@ -1,6 +1,13 @@
-# Welcome to your Expo app 👋
+# Refrence Homes Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Bu, Refrence Homes için geliştirilmiş mobil uygulamasıdır. Uygulama, https://app.referencehomes.com/ web sitesini WebView içinde gösterir.
+
+## Özellikler
+
+- WebView tabanlı mobil uygulama
+- Koyu tema desteği
+- Responsive tasarım
+- Native performans
 
 ## Get started
 
