@@ -41,14 +41,10 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "619bf477-5731-47b2-b79b-7ed4ef398e23"
-      }
+      "router": {}
     },
     "cli": {
       "appVersionSource": "remote"
-    },
-    "owner": "refrencehomes"
+    }
   }
 }
