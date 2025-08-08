@@ -18,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.refrencehomes.mobile"
+      "package": "com.refrencehomes.app2025"
     },
     "web": {
       "bundler": "metro",
