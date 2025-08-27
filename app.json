@@ -2,7 +2,7 @@
   "expo": {
     "name": "Refrence Homes",
     "slug": "refrence-homes",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "webviewapp",
@@ -12,11 +12,14 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.refrencehomes.app2025",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIRequiresFullScreen": true,
+        "UIStatusBarHidden": false,
+        "UIViewControllerBasedStatusBarAppearance": false
       }
     },
     "android": {
-      "versionCode": 4,
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
