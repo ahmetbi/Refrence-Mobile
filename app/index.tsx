@@ -1,5 +1,5 @@
 // app/index.tsx
-import { View, StyleSheet, StatusBar, Alert, Platform } from 'react-native';
+import { View, StyleSheet, StatusBar, Alert, Platform, SafeAreaView } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useState } from 'react';
 
@@ -61,38 +61,60 @@ export default function Home() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar
         barStyle="dark-content"
-        backgroundColor="transparent"
-        translucent={true}
+        backgroundColor="#ffffff"
+        translucent={false}
         hidden={false}
       />
-             <WebView
-         source={{ uri: currentUrl }}
-         startInLoadingState
-                   style={{ flex: 1, marginTop: 0 }}
-          bounces={false}
-         scrollEnabled={true}
-         showsHorizontalScrollIndicator={false}
-         showsVerticalScrollIndicator={false}
-         automaticallyAdjustContentInsets={true}
-         contentInsetAdjustmentBehavior="automatic"
-         // iOS status bar için güvenli alan
-                   contentInset={{ top: Platform.OS === 'ios' ? 0 : 0, bottom: 0, left: 0, right: 0 }}
-          onNavigationStateChange={handleNavigationStateChange}
-          onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
-          onMessage={handleMessage}
-          // iOS zoom özelliğini kapatmak için ek ayarlar
-         allowsInlineMediaPlayback={true}
-         mediaPlaybackRequiresUserAction={false}
-         // Zoom'u engellemek için ek özellikler
-         allowsLinkPreview={false}
-         allowsBackForwardNavigationGestures={false}
-         // Android için ek zoom engelleme
-         overScrollMode="never"
+                          <WebView
+        source={{ uri: currentUrl }}
+        startInLoadingState
+        style={{ flex: 1, marginTop: 0 }}
+        // iOS WebView bounce tamamen kapat
+        bounces={false}
+        alwaysBounceVertical={false}
+        alwaysBounceHorizontal={false}
+        scrollEnabled={true}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        automaticallyAdjustContentInsets={false}
+        contentInsetAdjustmentBehavior="never"
+        // WebView scroll davranışını kontrol et
+        contentInset={{ top: 0, bottom: 0, left: 0, right: 0 }}
+        // iOS WebView için ek kontroller
+        {...(Platform.OS === 'ios' && {
+          allowsBackForwardNavigationGestures: false,
+        })}
+        onNavigationStateChange={handleNavigationStateChange}
+        onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
+        onMessage={handleMessage}
+        // Media ayarları
+        allowsInlineMediaPlayback={true}
+        mediaPlaybackRequiresUserAction={false}
+        // Link ve navigasyon
+        allowsLinkPreview={false}
+        allowsBackForwardNavigationGestures={false}
+        // Scroll optimizasyonu
+        overScrollMode="never"
+        decelerationRate="normal"
+        // Pull-to-refresh kapalı
+        pullToRefreshEnabled={false}
+        // Scroll performansı
+        keyboardDisplayRequiresUserAction={false}
+        suppressesIncrementalRendering={false}
         injectedJavaScript={`
           (function() {
+            // WebView için özel bounce engelleme
+            if (window.webkit && window.webkit.messageHandlers) {
+              // iOS WebView içindeyiz
+              Object.defineProperty(document.body.style, 'overflow', {
+                value: 'hidden',
+                writable: false
+              });
+            }
+            
             // Zoom'u devre dışı bırak - iOS için geliştirilmiş
             var meta = document.createElement('meta');
             meta.name = 'viewport';
@@ -105,21 +127,26 @@ export default function Home() {
               existingMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no');
             }
             
-                         // Status bar için padding ekle (iOS özel)
+                         // SafeAreaView kullanıyoruz - CSS padding'e gerek yok
              var style = document.createElement('style');
              style.textContent = \`
                body { 
-                 padding-top: env(safe-area-inset-top) !important; 
+                 /* Status bar opaque olduğu için padding yok */
+                 padding-top: 0px !important; 
                  margin: 0 !important;
                  -webkit-overflow-scrolling: touch;
                  -webkit-user-select: none;
                  -webkit-touch-callout: none;
                  -webkit-tap-highlight-color: transparent;
                  touch-action: manipulation;
-                 /* iOS status bar için ek güvenlik */
-                 padding-left: env(safe-area-inset-left) !important;
-                 padding-right: env(safe-area-inset-right) !important;
-                 padding-bottom: env(safe-area-inset-bottom) !important;
+                 /* iOS rubber band kontrol */
+                 overscroll-behavior: none !important;
+                 overscroll-behavior-y: none !important;
+                 overscroll-behavior-x: none !important;
+                 /* Yanlardan padding yok */
+                 padding-left: 0px !important;
+                 padding-right: 0px !important;
+                 padding-bottom: 0px !important;
                }
                                /* Sadece zoom için gerekli olan elementlere touch-action uygula */
                 img, video, canvas {
@@ -129,38 +156,48 @@ export default function Home() {
                   touch-action: auto;
                   -webkit-user-select: text;
                 }
-               /* Header ve navigation için güvenli alan */
+               /* Web sitesi header'ı normal */
                .header, header, nav, .navbar, .top-bar, .topbar, .navigation { 
-                 padding-top: calc(env(safe-area-inset-top) + 20px) !important; 
+                 /* Normal header - padding yok */
+                 margin-top: 0px !important;
+                 padding-top: 0px !important; 
                  position: relative;
                  z-index: 1000;
-                 /* iOS status bar ile çakışmayı önle */
-                 margin-top: 0 !important;
                }
-               .main-content {
-                 padding-top: env(safe-area-inset-top) !important;
+               /* Ana içerik alanları normal */
+               .main-content, .content, .container, main, #main, #content, #app {
+                 /* Normal padding */
+                 padding-top: 0px !important;
                }
-                               /* Zoom'u engellemek için ek CSS */
+                               /* WebView için bounce engelleme */
                 html, body {
                   overflow-x: hidden;
-                  -webkit-text-size-adjust: 100%;
-                  -ms-text-size-adjust: 100%;
-                  text-size-adjust: 100%;
-                  /* iOS safe area desteği */
-                  min-height: 100vh;
-                  min-height: -webkit-fill-available;
-                  /* %100 zoom engelleme */
+                  /* iOS bounce engelleme - WebView özel */
+                  overscroll-behavior: none !important;
+                  overscroll-behavior-y: none !important;  
+                  overscroll-behavior-x: none !important;
+                  /* WebView için smooth scroll kapalı */
+                  -webkit-overflow-scrolling: auto;
+                  /* Touch action kontrolü */
+                  touch-action: pan-y pinch-zoom;
+                  /* Zoom engelleme */
                   -webkit-user-zoom: none;
                   -moz-user-zoom: none;
                   -ms-user-zoom: none;
                   user-zoom: none;
-                                     /* Sadece zoom engelleme */
-                   -webkit-touch-callout: none;
+                  -webkit-touch-callout: none;
+                  /* iOS text size */
+                  -webkit-text-size-adjust: 100%;
+                  -ms-text-size-adjust: 100%;
+                  text-size-adjust: 100%;
+                  /* Safe area */
+                  min-height: 100vh;
+                  min-height: -webkit-fill-available;
                 }
-                /* iOS için ek güvenlik */
+                /* iOS için ek güvenlik - normal padding */
                 @supports (padding: max(0px)) {
                   body {
-                    padding-top: max(env(safe-area-inset-top), 20px) !important;
+                    padding-top: 0px !important;
                   }
                 }
                                  /* Android için minimal zoom engelleme */
@@ -170,48 +207,29 @@ export default function Home() {
              \`;
              document.head.appendChild(style);
             
-                         // Touch olaylarını engelle - %100 zoom engelleme
+                         // Zoom engelleme ve bounce sıfırlama
+             var startY = 0;
              document.addEventListener('touchstart', function(e) {
-               // Çoklu dokunma engelle
+               startY = e.touches[0].pageY;
+               // Pinch zoom engelle
                if (e.touches.length > 1) {
                  e.preventDefault();
-                 e.stopPropagation();
-                 return false;
-               }
-               // Pinch zoom engelle
-               if (e.touches.length === 2) {
-                 e.preventDefault();
-                 e.stopPropagation();
                  return false;
                }
              }, { passive: false });
              
              document.addEventListener('touchmove', function(e) {
-               // Çoklu dokunma engelle
+               // Sadece pinch zoom engelle - scroll'a hiç müdahale etme
                if (e.touches.length > 1) {
                  e.preventDefault();
-                 e.stopPropagation();
-                 return false;
-               }
-               // Pinch zoom engelle
-               if (e.touches.length === 2) {
-                 e.preventDefault();
-                 e.stopPropagation();
                  return false;
                }
              }, { passive: false });
              
              document.addEventListener('touchend', function(e) {
-               // Çoklu dokunma engelle
+               // Sadece pinch zoom engelle
                if (e.touches.length > 1) {
                  e.preventDefault();
-                 e.stopPropagation();
-                 return false;
-               }
-               // Pinch zoom engelle
-               if (e.touches.length === 2) {
-                 e.preventDefault();
-                 e.stopPropagation();
                  return false;
                }
              }, { passive: false });
@@ -309,7 +327,7 @@ export default function Home() {
           })();
         `}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -317,12 +335,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
-    // iOS için safe area desteği
-    paddingTop: Platform.OS === 'ios' ? 0 : 0,
-    // iOS status bar için ek güvenlik
-    ...(Platform.OS === 'ios' && {
-      paddingTop: 0,
-      marginTop: 0,
-    }),
+    // SafeAreaView otomatik status bar padding'i ekler
   },
 });
+
