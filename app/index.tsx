@@ -148,9 +148,9 @@ export default function Home() {
                  padding-right: 0px !important;
                  padding-bottom: 0px !important;
                }
-                               /* Sadece zoom için gerekli olan elementlere touch-action uygula */
+                               /* Görsellerde scroll'a izin ver, sadece zoom engelle */
                 img, video, canvas {
-                  touch-action: none;
+                  touch-action: pan-y pan-x;
                 }
                 input, textarea, button, a, [role="button"], [tabindex] {
                   touch-action: auto;
@@ -200,9 +200,9 @@ export default function Home() {
                     padding-top: 0px !important;
                   }
                 }
-                                 /* Android için minimal zoom engelleme */
+                                 /* Görsellerde scroll serbest, zoom engelle */
                  img, video, canvas {
-                   touch-action: none !important;
+                   touch-action: pan-y pan-x !important;
                  }
              \`;
              document.head.appendChild(style);
